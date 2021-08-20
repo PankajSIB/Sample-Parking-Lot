@@ -11,15 +11,19 @@ type diContainer struct {
 		MongoDBClient() (*mongo.Client, error)
 	}
 	httpHandlers *httpHandlers
+	slot *slots
 
 	httpRouter func()(http.Handler,error)
+	insertTicket func()(*ticketRepository,error)
 }
 
-func newDIContainer() *diContainer {
+func newDIContainer(capacity int) *diContainer {
 	diC := &diContainer{}
+	diC.slot = newSlots(capacity)
 	diC.CommonDIC = Sample.NewCommonDIContainer()
-	diC.httpHandlers = newHTTPHandlers()
+	diC.httpHandlers = newHTTPHandlers(diC)
 	diC.httpRouter =  newHTTPRouterDIProvider(diC)
+	diC.insertTicket = newTicketRepositoryDIProvider(diC)
 	return diC
 }
 

@@ -10,11 +10,13 @@ import (
 
 type httpHandlers struct {
 	validateapi         func() (http.Handler, error)
+	postticket          func() (http.Handler, error)
 }
 
-func newHTTPHandlers()*httpHandlers {
+func newHTTPHandlers(dic *diContainer)*httpHandlers {
 	return &httpHandlers{
 		validateapi:newValidateApiDIProvider(),
+		postticket: newPostTicketHandlerDIProvider(dic),
 	}
 }
 
@@ -28,6 +30,11 @@ func registerHTTPHandlers(r *mux.Router,hs *httpHandlers)(error){
 			name: "validateapi",
 			configure:configureValidateAPIHTTPRoute,
 			handler: hs.validateapi,
+		},
+		{
+			name: "postTicket",
+			configure:configurePostTicketHTTPRoute,
+			handler: hs.postticket,
 		},
 	}{
 		h,err := v.handler()
